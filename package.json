@@ -1,0 +1,109 @@
+{
+  "name": "vsls-pomodoro",
+  "displayName": "VS Live Share Pomodoro",
+  "description": "Adds a collaborative Pomodoro timer to Visual Studio Live Share sessions",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.30.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onFileSystem:vsls",
+    "onCommand:liveshare.start",
+    "onCommand:liveshare.startFromActivityBar",
+    "onCommand:liveshare.startReadOnly",
+    "onCommand:liveshare.startReadOnlyFromActivityBar",
+    "onCommand:liveshare.startReadOnlyFromSessionExplorer"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "liveshare.pomodoro.start",
+        "title": "Start",
+        "category": "Pomodoro",
+        "icon": {
+          "dark": "",
+          "light": ""
+        }
+      },
+      {
+        "command": "liveshare.pomodoro.pause",
+        "title": "Pause",
+        "category": "Pomodoro",
+        "icon": {
+          "dark": "",
+          "light": ""
+        }
+      },
+      {
+        "command": "liveshare.pomodoro.reset",
+        "title": "Reset",
+        "category": "Pomodoro",
+        "icon": {
+          "dark": "",
+          "light": ""
+        }
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "liveshare.pomodoro.start",
+          "when": "liveshare.pomodoro.state == stopped || liveshare.pomodoro.state == paused"
+        },
+        {
+          "command": "liveshare.pomodoro.pause",
+          "when": "liveshare.pomodoro.state == running"
+        },
+        {
+          "command": "liveshare.pomodoro.reset",
+          "when": "liveshare.pomodoro.state == running || liveshare.pomodoro.state == paused"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "VS Live Share Pomodoro",
+      "properties": {
+        "vsls-pomodoro.intervalDuration": {
+          "default": 25,
+          "type": "number",
+          "description": "Specifies the duration of each individual interval in minutes."
+        },
+        "vsls-pomodoro.breakDuration": {
+          "default": 5,
+          "type": "number",
+          "description": "Specifies the duration of each short break in minutes."
+        },
+        "vsls-pomodoro.longBreakDuration": {
+          "default": 15,
+          "type": "number",
+          "description": "Specifies the duration of each long break in minutes."
+        },
+        "vsls-pomodoro.intervalCount": {
+          "default": 4,
+          "type": "number",
+          "description": "Specifies the number of intervals to perform within a pomodoro session."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^8.10.25",
+    "tslint": "^5.8.0",
+    "typescript": "^3.1.4",
+    "vscode": "^1.1.25",
+    "vsls": "^0.3.967"
+  }
+}
