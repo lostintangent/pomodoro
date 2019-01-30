@@ -1,10 +1,11 @@
 import * as vscode from "vscode";
 import * as vsls from "vsls/vscode";
 
-import { registerLiveShareSessionProvider } from "./tree-provider";
+import { registerLiveShareSessionProvider, treeDataProvider } from "./tree-provider";
 
 import { COMMAND_IDS, State } from "./constants";
-import { pomodoro } from "./pomodoro";
+import { Pomodoro } from "./pomodoro";
+import { config } from "./pomodoroConfig";
 
 const setExtensionContext = async (state: State) => {
   await vscode.commands.executeCommand(
@@ -17,6 +18,10 @@ const setExtensionContext = async (state: State) => {
 export async function activate(context: vscode.ExtensionContext) {
   const vslsAPI = await vsls.getApi();
   registerLiveShareSessionProvider(vslsAPI!);
+
+  const pomodoro = new Pomodoro(config);
+
+  pomodoro.onRefresh(treeDataProvider.updateRemainingTime);
 
   const startCommand = vscode.commands.registerCommand(
     COMMAND_IDS.start,

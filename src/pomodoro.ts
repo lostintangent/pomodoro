@@ -1,13 +1,15 @@
 const REFRESH_TICK_DELAY = 1000;
 
-const sleepAsync = (delay: number = 1000) => {
+import { IPomodoroConfig } from "./pomodoroConfig";
+
+const sleepAsync = (delay: number = REFRESH_TICK_DELAY) => {
   return new Promise(res => {
     // TODO: move to rAF
     setTimeout(res, delay);
   });
 };
 
-class Pomodoro {
+class PomodoroTimer {
   constructor() {}
 
   // TODO: move to event emitters
@@ -15,7 +17,7 @@ class Pomodoro {
   private onEndCallbacks: Function[] = [];
   private onStartCallbacks: Function[] = [];
 
-  public async start(period: number) {
+  public start = async (period: number) => {
     this.startTime = Date.now();
     this.endTime = this.startTime + period;
 
@@ -28,9 +30,10 @@ class Pomodoro {
     return this;
   }
 
-  private emitEvent = async (callbacksArray: Function[]) => {
+  // move to event emitters
+  private emitEvent = async (callbacksArray: Function[], ...args: any[]) => {
     for (let callback of callbacksArray) {
-      await callback();
+      await callback(...args);
     }
   };
 
@@ -40,12 +43,24 @@ class Pomodoro {
 
   // --------------
 
-  private isRunning: boolean = false;
-  private isPaused: boolean = false;
+  public isRunning: boolean = false;
+  public isPaused: boolean = false;
 
-  private startTime: number | undefined;
+  private startTime: number = 0;
+  
+  private endTime: number = 0;
 
-  private endTime: number | undefined;
+  public onStart = (callback: Function) => {
+    this.onStartCallbacks.push(callback);
+  }
+
+  public onRefresh = (callback: Function) => {
+    this.onRefreshCallbacks.push(callback);
+  }
+
+  public onEnd = (callback: Function) => {
+    this.onEndCallbacks.push(callback);
+  }
 
   private loop = async () => {
     await sleepAsync();
@@ -62,10 +77,38 @@ class Pomodoro {
       return;
     }
 
-    await this.emitEvent(this.onRefreshCallbacks);
-
-    this.loop();
+    await this.emitEvent(this.onRefreshCallbacks, this.endTime - Date.now());
+    
+    await this.loop();
   };
 }
 
-export const pomodoro = new Pomodoro();
+export class Pomodoro {
+  private readonly timer: PomodoroTimer = new PomodoroTimer();
+  private intervalIndex: number = 0;
+  // private isAutoPaused: boolean = false;
+  // private isPaused: boolean = false;
+
+  constructor(
+    private config: IPomodoroConfig
+  ) {
+  }
+
+  public onRefresh = (callback: Function) => {
+    this.timer.onRefresh(callback);
+    this.intervalIndex;
+  }
+
+  public start() {
+    this.timer.start(this.config.intervalDuration * 60 * 1000);
+  }
+
+  public pause() {
+    this.timer.pause();
+  }
+
+  public reset() {
+    this.intervalIndex = 0;
+  }
+}
+

@@ -1,24 +1,41 @@
-import { Command, ProviderResult, TreeDataProvider, TreeItem } from "vscode";
+import { Command, ProviderResult, TreeDataProvider, TreeItem, EventEmitter } from "vscode";
 import { LiveShare, View } from "vsls/vscode";
 
-const DATA_PROVIDER: TreeDataProvider<Command> = {
+class PomodoroTreeDataProvider implements TreeDataProvider<Command> {
+
+  private changeEventEmitter = new EventEmitter<Command>();
+  public readonly onDidChangeTreeData = this.changeEventEmitter.event;
+  
+  private pomodoroCommand: Command;
+  private static readonly baseTitle = "Pomodoro";
+
+  constructor() {
+    this.pomodoroCommand = {
+      command: "liveshare.pomodoro.start",
+      title: PomodoroTreeDataProvider.baseTitle
+    };
+  }
+
   getChildren(element?: Command): ProviderResult<Command[]> {
-    return Promise.resolve([
-      {
-        command: "liveshare.pomodoro.start",
-        title: "Pomodoro"
-      }
-    ]);
-  },
+    return Promise.resolve([this.pomodoroCommand]);
+  }
+
+  updateRemainingTime = (remainingTime: number) => {
+    this.pomodoroCommand.title = `${PomodoroTreeDataProvider.baseTitle} ${remainingTime}`;
+    this.changeEventEmitter.fire(this.pomodoroCommand);
+  }
+
   getTreeItem(element: Command): TreeItem {
     const treeItem = new TreeItem("Pomodoro");
     treeItem.contextValue = "Pomodoro";
     treeItem.command = element;
+    treeItem.label = element.title;
     return treeItem;
   }
-};
+}
 
+export const treeDataProvider = new PomodoroTreeDataProvider();
 export const registerLiveShareSessionProvider = (vslsApi: LiveShare) => {
-  vslsApi.registerTreeDataProvider(View.Session, DATA_PROVIDER);
-  vslsApi.registerTreeDataProvider(View.ExplorerSession, DATA_PROVIDER);
+  vslsApi.registerTreeDataProvider(View.Session, treeDataProvider);
+  vslsApi.registerTreeDataProvider(View.ExplorerSession, treeDataProvider);
 };
