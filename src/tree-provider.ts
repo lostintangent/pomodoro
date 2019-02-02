@@ -1,35 +1,37 @@
 import { Command, ProviderResult, TreeDataProvider, TreeItem, EventEmitter } from "vscode";
 import { LiveShare, View } from "vsls/vscode";
+import { msToTimeString } from "./utils/msToTimeString";
+import { APP_NAME, START_COMMAND, PAUSE_COMMAND } from "./constants";
 
 class PomodoroTreeDataProvider implements TreeDataProvider<Command> {
 
-  private changeEventEmitter = new EventEmitter<Command>();
+  private changeEventEmitter = new EventEmitter<Command | undefined | null>();
   public readonly onDidChangeTreeData = this.changeEventEmitter.event;
   
-  private pomodoroCommand: Command;
-  private static readonly baseTitle = "Pomodoro";
-
-  constructor() {
-    this.pomodoroCommand = {
-      command: "liveshare.pomodoro.start",
-      title: PomodoroTreeDataProvider.baseTitle
-    };
-  }
+  private remainingTime = "";
+  private currentCommand: Command = START_COMMAND;
 
   getChildren(element?: Command): ProviderResult<Command[]> {
-    return Promise.resolve([this.pomodoroCommand]);
+    return Promise.resolve([this.currentCommand]);
   }
 
   updateRemainingTime = (remainingTime: number) => {
-    this.pomodoroCommand.title = `${PomodoroTreeDataProvider.baseTitle} ${remainingTime}`;
-    this.changeEventEmitter.fire(this.pomodoroCommand);
+    this.currentCommand = PAUSE_COMMAND;
+    this.remainingTime = msToTimeString(remainingTime);
+    this.changeEventEmitter.fire();
+  }
+
+  onPause = (remainingTime: number) => {
+    this.currentCommand = START_COMMAND;
+    this.remainingTime = msToTimeString(remainingTime);
+    this.changeEventEmitter.fire();
   }
 
   getTreeItem(element: Command): TreeItem {
-    const treeItem = new TreeItem("Pomodoro");
-    treeItem.contextValue = "Pomodoro";
+    const treeItem = new TreeItem(APP_NAME);
+    treeItem.contextValue = APP_NAME;
     treeItem.command = element;
-    treeItem.label = element.title;
+    treeItem.label = `${APP_NAME} - ${element.title} - ${this.remainingTime}`;
     return treeItem;
   }
 }

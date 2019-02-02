@@ -105,5 +105,8 @@
     "typescript": "^3.1.4",
     "vscode": "^1.1.25",
     "vsls": "^0.3.967"
+  },
+  "dependencies": {
+    "mobx": "^5.9.0"
   }
 }

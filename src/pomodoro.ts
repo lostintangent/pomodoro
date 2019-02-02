@@ -1,6 +1,7 @@
-const REFRESH_TICK_DELAY = 1000;
-
 import { IPomodoroConfig } from "./pomodoroConfig";
+import { minuteMs, secondMs } from "./constants";
+
+const REFRESH_TICK_DELAY = secondMs;
 
 const sleepAsync = (delay: number = REFRESH_TICK_DELAY) => {
   return new Promise(res => {
@@ -10,25 +11,15 @@ const sleepAsync = (delay: number = REFRESH_TICK_DELAY) => {
 };
 
 class PomodoroTimer {
+
   constructor() {}
 
   // TODO: move to event emitters
   private onRefreshCallbacks: Function[] = [];
   private onEndCallbacks: Function[] = [];
   private onStartCallbacks: Function[] = [];
-
-  public start = async (period: number) => {
-    this.startTime = Date.now();
-    this.endTime = this.startTime + period;
-
-    this.isRunning = true;
-
-    await this.emitEvent(this.onStartCallbacks);
-
-    this.loop();
-
-    return this;
-  }
+  private onPauseCallbacks: Function[] = [];
+  private onResetCallbacks: Function[] = [];
 
   // move to event emitters
   private emitEvent = async (callbacksArray: Function[], ...args: any[]) => {
@@ -37,17 +28,37 @@ class PomodoroTimer {
     }
   };
 
-  public pause() {}
+  public start = async (remainingTime?: number) => {
+    this.isPaused = false;
+    if (remainingTime) {
+      this.remainingTime = remainingTime;
+    }
+    this.endTime = Date.now() + this.remainingTime;
+    this.isRunning = true;
+    await this.emitEvent(this.onStartCallbacks);
+    this.loop();
+    return this;
+  }
 
-  public reset() {}
+  public pause = async (remainingTime?: number) => {
+    if (remainingTime) {
+      this.remainingTime = remainingTime;
+    }
+    this.isPaused = true;
+
+    await this.emitEvent(this.onPauseCallbacks, this.remainingTime);
+  }
+
+  public reset = async () => {
+    await this.emitEvent(this.onResetCallbacks);
+  }
 
   // --------------
 
   public isRunning: boolean = false;
   public isPaused: boolean = false;
 
-  private startTime: number = 0;
-  
+  private remainingTime: number = 0;
   private endTime: number = 0;
 
   public onStart = (callback: Function) => {
@@ -62,11 +73,19 @@ class PomodoroTimer {
     this.onEndCallbacks.push(callback);
   }
 
+  public onPause = (callback: Function) => {
+    this.onPauseCallbacks.push(callback);
+  }
+
+  public onReset = (callback: Function) => {
+    this.onResetCallbacks.push(callback);
+  }
+
   private loop = async () => {
     await sleepAsync();
 
     if (Date.now() >= this.endTime!) {
-      delete this.startTime;
+      delete this.remainingTime;
       delete this.endTime;
 
       this.isRunning = false;
@@ -77,7 +96,11 @@ class PomodoroTimer {
       return;
     }
 
-    await this.emitEvent(this.onRefreshCallbacks, this.endTime - Date.now());
+    if (this.isPaused) {
+      return;
+    }
+    this.remainingTime = this.endTime - Date.now();
+    await this.emitEvent(this.onRefreshCallbacks, this.remainingTime);
     
     await this.loop();
   };
@@ -85,7 +108,6 @@ class PomodoroTimer {
 
 export class Pomodoro {
   private readonly timer: PomodoroTimer = new PomodoroTimer();
-  private intervalIndex: number = 0;
   // private isAutoPaused: boolean = false;
   // private isPaused: boolean = false;
 
@@ -96,19 +118,35 @@ export class Pomodoro {
 
   public onRefresh = (callback: Function) => {
     this.timer.onRefresh(callback);
-    this.intervalIndex;
+  }
+
+  public onStart = (callback: Function) => {
+    this.timer.onStart(callback);
+  }
+
+  public onEnd = (callback: Function) => {
+    this.timer.onEnd(callback);
+  }
+
+  public onPause = (callback: Function) => {
+    this.timer.onPause(callback);
+  }
+
+  public onReset = (callback: Function) => {
+    this.timer.onReset(callback);
   }
 
   public start() {
-    this.timer.start(this.config.intervalDuration * 60 * 1000);
+    this.timer.start(this.config.intervalDuration * minuteMs);
   }
 
-  public pause() {
-    this.timer.pause();
+  public pause(remainingTime?: number) {
+    this.timer.pause(remainingTime);
   }
 
   public reset() {
-    this.intervalIndex = 0;
+
   }
+
 }
 
