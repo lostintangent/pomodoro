@@ -7,6 +7,8 @@ import { COMMAND_IDS, State } from "./constants";
 import { Pomodoro } from "./pomodoro";
 import { config } from "./pomodoroConfig";
 
+console.log("test")
+
 const setExtensionContext = async (state: State) => {
   await vscode.commands.executeCommand(
     "setContext",
