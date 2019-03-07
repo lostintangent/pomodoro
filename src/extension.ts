@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as vsls from "vsls/vscode";
 
 import { registerLiveShareSessionProvider, treeDataProvider } from "./tree-provider";
-
+console.log('test')
 import { COMMAND_IDS, State } from "./constants";
 import { Pomodoro } from "./pomodoro";
 import { config } from "./pomodoroConfig";
