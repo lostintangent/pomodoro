@@ -18,6 +18,7 @@ class PomodoroTimer {
   private onStartCallbacks: Function[] = [];
 
   public start = async (period: number) => {
+    console.log('starting...');
     this.startTime = Date.now();
     this.endTime = this.startTime + period;
 
