@@ -17,6 +17,7 @@ const setExtensionContext = async (state: State) => {
 };
 
 export async function activate(context: vscode.ExtensionContext) {
+  console.log('activating')
   const vslsAPI = await vsls.getApi();
   registerLiveShareSessionProvider(vslsAPI!);
 
