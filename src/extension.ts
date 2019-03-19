@@ -1,13 +1,14 @@
 import * as vscode from "vscode";
-import * as vsls from "vsls/vscode";
 
-import { registerLiveShareSessionProvider, treeDataProvider } from "./tree-provider";
+import { registerLiveShareSessionProvider } from "./tree-provider";
 
 import { COMMAND_IDS, State } from "./constants";
 import { Pomodoro } from "./pomodoro";
 import { config } from "./pomodoroConfig";
-import { GuestService } from "./service/guestService";
-import { HostService } from "./service/hostService";
+import { createStore, Action, combineReducers } from 'redux';
+import { startAction, pauseAction, resetAction } from "./actions/actions";
+import { stateReducer } from "./reducers/stateReducer";
+import { configReducer, remainingTimeReducer, completedSegmentsReducer } from "./reducers";
 
 const setExtensionContext = async (state: State) => {
   await vscode.commands.executeCommand(
@@ -17,50 +18,43 @@ const setExtensionContext = async (state: State) => {
   );
 };
 
+const reducer = combineReducers({
+  completedSegments: completedSegmentsReducer,
+  remainingTime: remainingTimeReducer,
+  config: configReducer,
+  state: stateReducer,
+});
+
 export async function activate(context: vscode.ExtensionContext) {
+  const store = createStore(reducer);
   const pomodoro = new Pomodoro(config);
 
-  const vslsAPI = await vsls.getApi();
-  if (vslsAPI) {
-    registerLiveShareSessionProvider(vslsAPI!);
-    vslsAPI.onDidChangeSession((e: vsls.SessionChangeEvent) => {
-      switch (e.session.role) {
-        case vsls.Role.Guest:
-          new GuestService(undefined, pomodoro, vslsAPI);
-          break;
-        case vsls.Role.Host:
-          new HostService(undefined, pomodoro, vslsAPI);
-          break;
-        default:
-          return;
-      }
-    });
-  }
+  registerLiveShareSessionProvider(store)
 
-  pomodoro.onRefresh(treeDataProvider.updateRemainingTime);
-  pomodoro.onPause(treeDataProvider.onPause);
-
+  store.subscribe(async () => {
+    const { state } = store.getState();
+    await setExtensionContext(state.isBreak ? State.paused : State.running)    
+  });
+  
   const startCommand = vscode.commands.registerCommand(
     COMMAND_IDS.start,
     async () => {
-      await setExtensionContext(State.running);
-      pomodoro.start();
+      store.dispatch(startAction());
     }
   );
 
   const pauseCommand = vscode.commands.registerCommand(
     COMMAND_IDS.pause,
     async () => {
-      await setExtensionContext(State.paused);
-      pomodoro.pause();
+      const { remainingTime } = store.getState();
+      store.dispatch(pauseAction(remainingTime));
     }
   );
 
   const resetCommand = vscode.commands.registerCommand(
     COMMAND_IDS.reset,
     async () => {
-      await setExtensionContext(State.stopped);
-      pomodoro.reset();
+      store.dispatch(resetAction());
     }
   );
 

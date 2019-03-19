@@ -101,12 +101,15 @@
   "devDependencies": {
     "@types/mocha": "^2.2.42",
     "@types/node": "^8.10.25",
+    "@types/redux": "^3.6.0",
     "tslint": "^5.8.0",
     "typescript": "^3.1.4",
     "vscode": "^1.1.25",
     "vsls": "^0.3.967"
   },
   "dependencies": {
-    "mobx": "^5.9.0"
+    "mobx": "^5.9.0",
+    "vsls-redux": "^1.0.1",
+    "redux": "^4.0.1"
   }
 }
