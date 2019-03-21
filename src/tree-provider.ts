@@ -1,7 +1,7 @@
 import { Command, ProviderResult, TreeDataProvider, TreeItem, EventEmitter } from "vscode";
 import { getApi, View } from "vsls/vscode";
-import { msToTimeString } from "./utils/msToTimeString";
-import { APP_NAME, START_COMMAND } from "./constants";
+import { secondsToTimeString } from "./utils/secondsToTimeString";
+import { APP_NAME, START_COMMAND, PAUSE_COMMAND } from "./constants";
 import { Store, Action } from 'redux';
 import { IAppState, IState } from "./IAppState";
 
@@ -15,14 +15,16 @@ class PomodoroTreeDataProvider implements TreeDataProvider<Command> {
   constructor(store: Store<IAppState, Action>) {
     store.subscribe(() => {
       const { remainingTime, state } = store.getState();
-      this.remainingTime = msToTimeString(remainingTime);
-      // this.currentCommand = stateToCommand(state); 
+      this.remainingTime = secondsToTimeString(remainingTime);
+      this.currentCommand = this.stateToCommand(state); 
       this.changeEventEmitter.fire();
     })
   }
 
   private stateToCommand(state: IState) {
-    return;
+      return (state.isPaused)
+              ? START_COMMAND
+              : PAUSE_COMMAND;
   }
 
   getChildren(element?: Command): ProviderResult<Command[]> {
