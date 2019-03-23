@@ -1,6 +1,6 @@
 
 import { Action } from 'redux';
-import { TICK } from '../actions/actions';
+import { TICK, STOP_ACTION } from '../actions/actions';
 
 const DEFAULT_REMAINING_TIME = 25 * 60; // 25 minutes in seconds
 
@@ -8,6 +8,9 @@ export const remainingTimeReducer = (currentRemainingTime: number = DEFAULT_REMA
     switch (action.type) {
       case TICK: {
         return Math.max(--currentRemainingTime, 0);
+      }
+      case STOP_ACTION: {
+        return DEFAULT_REMAINING_TIME;
       }
     }
     

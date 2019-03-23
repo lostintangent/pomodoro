@@ -2,7 +2,7 @@ import { Command } from "vscode";
 
 export const COMMAND_IDS = {
   start: "liveshare.pomodoro.start",
-  pause: "liveshare.pomodoro.pause",
+  stop: "liveshare.pomodoro.stop",
   reset: "liveshare.pomodoro.reset"
 };
 
@@ -22,12 +22,12 @@ export const START_COMMAND: Command = {
   title: "Start"
 };
 
-export const PAUSE_COMMAND: Command = {
-  command: COMMAND_IDS.pause,
-  title: "Pause"
+export const STOP_COMMAND: Command = {
+  command: COMMAND_IDS.stop,
+  title: "Stop"
 };
 
 export const RESET_COMMAND: Command = {
-  command: COMMAND_IDS.pause,
+  command: COMMAND_IDS.reset,
   title: "Reset"
 };

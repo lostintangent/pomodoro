@@ -1,42 +1,83 @@
-import { Command, ProviderResult, TreeDataProvider, TreeItem, EventEmitter } from "vscode";
+import { Command, ProviderResult, TreeDataProvider, TreeItem, EventEmitter, TreeItemCollapsibleState } from "vscode";
 import { getApi, View } from "vsls/vscode";
 import { secondsToTimeString } from "./utils/secondsToTimeString";
-import { APP_NAME, START_COMMAND, PAUSE_COMMAND } from "./constants";
+import { APP_NAME, START_COMMAND, STOP_COMMAND } from "./constants";
 import { Store, Action } from 'redux';
 import { IAppState, IState } from "./IAppState";
 
-class PomodoroTreeDataProvider implements TreeDataProvider<Command> {
-  private changeEventEmitter = new EventEmitter<Command | undefined | null>();
-  public readonly onDidChangeTreeData = this.changeEventEmitter.event;
-  
-  private remainingTime = "";
-  private currentCommand: Command = START_COMMAND;
+enum PomodoroTreeItem {
+  root = 'root',
+  controls = 'controls'
+}
 
-  constructor(store: Store<IAppState, Action>) {
+class PomodoroTreeDataProvider implements TreeDataProvider<PomodoroTreeItem> {
+  private changeEventEmitter = new EventEmitter<PomodoroTreeItem | undefined | null>();
+  public readonly onDidChangeTreeData = this.changeEventEmitter.event;
+
+  constructor(private store: Store<IAppState, Action>) {
     store.subscribe(() => {
-      const { remainingTime, state } = store.getState();
-      this.remainingTime = secondsToTimeString(remainingTime);
-      this.currentCommand = this.stateToCommand(state); 
       this.changeEventEmitter.fire();
-    })
+    });
   }
 
   private stateToCommand(state: IState) {
       return (state.isPaused)
               ? START_COMMAND
-              : PAUSE_COMMAND;
+              : STOP_COMMAND;
   }
 
-  getChildren(element?: Command): ProviderResult<Command[]> {
-    return Promise.resolve([this.currentCommand]);
+  getChildren(element?: PomodoroTreeItem): ProviderResult<PomodoroTreeItem[]> {
+    if (!element) {
+      return [PomodoroTreeItem.root];
+    }
+
+    return [PomodoroTreeItem.controls];
   }
 
-  getTreeItem(element: Command): TreeItem {
+  getTreeItem(element: PomodoroTreeItem): TreeItem {
+    switch (element) {
+      case PomodoroTreeItem.root: {
+        return this.getRootItem();
+      }
+
+      case PomodoroTreeItem.controls: {
+        return this.getControlsItem();
+      }
+    }
+  }
+
+  getRootItem(): TreeItem {
+    const { completedSegments, config } = this.store.getState();
+
     const treeItem = new TreeItem(APP_NAME);
-    treeItem.contextValue = APP_NAME;
-    treeItem.command = element;
-    treeItem.label = `${APP_NAME} - ${element.title} - ${this.remainingTime}`;
+    treeItem.contextValue = 'liveshare.pomodoro.root';
+    treeItem.label = `${APP_NAME} (${completedSegments}/${config.intervalCount})`;
+    treeItem.collapsibleState = TreeItemCollapsibleState.Expanded;
     return treeItem;
+  }
+  
+  private getControlsItem(): TreeItem {
+    const { remainingTime, state} = this.store.getState();
+    const remainingTimeString = secondsToTimeString(remainingTime);
+
+    const treeItem = new TreeItem(APP_NAME);
+    treeItem.contextValue = 'liveshare.pomodoro.controlsitem';
+    treeItem.label = `${this.stateToEmoji(state)} ${this.stateToCaption(state)}... - [${remainingTimeString}]`;
+    treeItem.command = this.stateToCommand(state);
+    treeItem.collapsibleState = TreeItemCollapsibleState.None;
+    return treeItem;
+  }
+
+  private stateToEmoji(state: IState) {
+    return (state.isPaused)
+              ? '🌴'
+              : '🔨';
+  }
+
+  private stateToCaption(state: IState) {
+    return (state.isPaused)
+              ? 'Cooling down'
+              : 'Nailing it';
   }
 }
 

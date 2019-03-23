@@ -25,17 +25,17 @@
         "title": "Start",
         "category": "Pomodoro",
         "icon": {
-          "dark": "",
-          "light": ""
+          "dark": "./images/play.svg",
+          "light": "./images/play.svg"
         }
       },
       {
-        "command": "liveshare.pomodoro.pause",
-        "title": "Pause",
+        "command": "liveshare.pomodoro.stop",
+        "title": "Stop",
         "category": "Pomodoro",
         "icon": {
-          "dark": "",
-          "light": ""
+          "dark": "./images/stop.svg",
+          "light": "./images/stop.svg"
         }
       },
       {
@@ -43,19 +43,36 @@
         "title": "Reset",
         "category": "Pomodoro",
         "icon": {
-          "dark": "",
-          "light": ""
+          "dark": "./images/cross.svg",
+          "light": "./images/cross.svg"
         }
       }
     ],
     "menus": {
+      "view/item/context": [
+        {
+          "command": "liveshare.pomodoro.stop",
+          "when": "viewItem == liveshare.pomodoro.controlsitem && liveshare.pomodoro.state == running",
+          "group": "inline"
+        },
+        {
+          "command": "liveshare.pomodoro.start",
+          "when": "viewItem == liveshare.pomodoro.controlsitem && liveshare.pomodoro.state == stopped",
+          "group": "inline"
+        },
+        {
+          "command": "liveshare.pomodoro.reset",
+          "when": "viewItem == liveshare.pomodoro.root",
+          "group": "inline"
+        }
+      ],
       "commandPalette": [
         {
           "command": "liveshare.pomodoro.start",
           "when": "liveshare.pomodoro.state == stopped || liveshare.pomodoro.state == paused"
         },
         {
-          "command": "liveshare.pomodoro.pause",
+          "command": "liveshare.pomodoro.stop",
           "when": "liveshare.pomodoro.state == running"
         },
         {

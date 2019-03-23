@@ -3,12 +3,12 @@ import * as vscode from "vscode";
 import { registerLiveShareSessionProvider } from "./tree-provider";
 
 import { COMMAND_IDS, State } from "./constants";
-import { config } from "./pomodoroConfig";
-import { createStore, Action, combineReducers } from 'redux';
-import { startAction, pauseAction, resetAction } from "./actions/actions";
+import { createStore, combineReducers, Action } from 'redux';
+import { startAction, pauseAction, resetAction, TICK, stopAction } from "./actions/actions";
 import { stateReducer } from "./reducers/stateReducer";
 import { configReducer, remainingTimeReducer, completedSegmentsReducer } from "./reducers";
 import { Clock } from "./clock";
+import { shareState, vslsStoreEnhancer} from 'vsls-redux';
 
 const setExtensionContext = async (state: State) => {
   await vscode.commands.executeCommand(
@@ -25,17 +25,23 @@ const reducer = combineReducers({
   state: stateReducer,
 });
 
+function tickFilter(action: Action): boolean {
+  return (action.type !== TICK);
+}
+
 export async function activate(context: vscode.ExtensionContext) {
-  const store = createStore(reducer);
+  const store = createStore(shareState(reducer), undefined, vslsStoreEnhancer(tickFilter) as any);
 
   new Clock(store);
 
   registerLiveShareSessionProvider(store);
 
   store.subscribe(async () => {
-    const { state } = store.getState();
-    await setExtensionContext(state.isBreak ? State.paused : State.running)    
+    const { remainingTime, state } = store.getState();
+    await setExtensionContext(state.isPaused ? State.stopped : State.running)    
   });
+
+  setExtensionContext(State.stopped);
   
   const startCommand = vscode.commands.registerCommand(
     COMMAND_IDS.start,
@@ -44,11 +50,10 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const pauseCommand = vscode.commands.registerCommand(
-    COMMAND_IDS.pause,
+  const stopCommand = vscode.commands.registerCommand(
+    COMMAND_IDS.stop,
     async () => {
-      const { remainingTime } = store.getState();
-      store.dispatch(pauseAction(remainingTime));
+      store.dispatch(stopAction());
     }
   );
 
@@ -59,7 +64,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  context.subscriptions.push(startCommand, pauseCommand, resetCommand);
+  context.subscriptions.push(startCommand, stopCommand, resetCommand);
 }
 
 export function deactivate() {}

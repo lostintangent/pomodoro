@@ -3,7 +3,7 @@ import { Action } from 'redux';
 import { IState } from '../IAppState';
 
 const DEFAULT_STATE_STATE = {
-  isPaused: false,
+  isPaused: true,
   isBreak: true
 };
 
@@ -25,7 +25,11 @@ export const stateReducer = (state: IState = DEFAULT_STATE_STATE, action: Action
         case RESET_ACTION:
           break;
         case STOP_ACTION:
-          break;
+          return {
+            ...state,
+            isPaused: true
+          }
+        break;
     }
     
     return state;

@@ -1,6 +1,6 @@
 import { Store, Action } from "redux";
 import { IAppState } from "./IAppState";
-import { tick } from "./actions/actions";
+import { tick, completeCurrentSegmentAction } from "./actions/actions";
 
 export class Clock {
 
