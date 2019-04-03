@@ -20,7 +20,18 @@ export class Clock {
         clearTimeout(this.timer!);
         this.timer = undefined;
 
-        const { state } = this.store.getState();
+        const { state, remainingTime, config } = this.store.getState();
+
+        if (remainingTime < 1) {
+            const nextAction = (!state.isBreak)
+                ? completeCurrentSegmentAction(config.breakDuration, false)
+                : completeCurrentSegmentAction(0, true);
+            
+            process.stdout.write('\x07');
+
+            return this.store.dispatch(nextAction)
+        }
+
         if (!state.isPaused) {
             this.timer = setTimeout(this.tick, 1000);
             this.store.dispatch(tick());

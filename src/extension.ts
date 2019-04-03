@@ -4,11 +4,12 @@ import { registerLiveShareSessionProvider } from "./tree-provider";
 
 import { COMMAND_IDS, State } from "./constants";
 import { createStore, combineReducers, Action } from 'redux';
-import { startAction, pauseAction, resetAction, TICK, stopAction } from "./actions/actions";
+import { startAction, resetAction, TICK, stopAction } from "./actions/actions";
 import { stateReducer } from "./reducers/stateReducer";
 import { configReducer, remainingTimeReducer, completedSegmentsReducer } from "./reducers";
 import { Clock } from "./clock";
 import { shareState, vslsStoreEnhancer} from 'vsls-redux';
+import { IAppState } from "./IAppState";
 
 const setExtensionContext = async (state: State) => {
   await vscode.commands.executeCommand(
@@ -37,7 +38,7 @@ export async function activate(context: vscode.ExtensionContext) {
   registerLiveShareSessionProvider(store);
 
   store.subscribe(async () => {
-    const { remainingTime, state } = store.getState();
+    const { state } = store.getState();
     await setExtensionContext(state.isPaused ? State.stopped : State.running)    
   });
 
@@ -46,14 +47,16 @@ export async function activate(context: vscode.ExtensionContext) {
   const startCommand = vscode.commands.registerCommand(
     COMMAND_IDS.start,
     async () => {
-      store.dispatch(startAction());
+      const { config } = store.getState() as IAppState;
+      store.dispatch(startAction(config.intervalDuration));
     }
   );
 
   const stopCommand = vscode.commands.registerCommand(
     COMMAND_IDS.stop,
     async () => {
-      store.dispatch(stopAction());
+      const { config } = <IAppState>store.getState();
+      store.dispatch(stopAction(config.intervalDuration));
     }
   );
 

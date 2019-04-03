@@ -14,16 +14,16 @@ export interface IPomodoroConfig {
 
 export const config: IPomodoroConfig = {
   get breakDuration() {
-    return getConfigValue("breakDuration") || 25;
+    return (getConfigValue("breakDuration") || .1) * 60;
   },
   get intervalCount() {
-    return getConfigValue("intervalCount") || 25;
+    return getConfigValue("intervalCount") || 4;
   },
   get intervalDuration() {
-    return getConfigValue("intervalDuration") || 25;
+    return (getConfigValue("intervalDuration") || .1) * 60;
   },
   get longBreakDuration() {
-    return getConfigValue("longBreakDuration") || 100;
+    return (getConfigValue("longBreakDuration") || .1) * 60;
   }
 };
 

@@ -1,4 +1,4 @@
-import { Command, ProviderResult, TreeDataProvider, TreeItem, EventEmitter, TreeItemCollapsibleState } from "vscode";
+import { ProviderResult, TreeDataProvider, TreeItem, EventEmitter, TreeItemCollapsibleState } from "vscode";
 import { getApi, View } from "vsls/vscode";
 import { secondsToTimeString } from "./utils/secondsToTimeString";
 import { APP_NAME, START_COMMAND, STOP_COMMAND } from "./constants";
@@ -69,13 +69,13 @@ class PomodoroTreeDataProvider implements TreeDataProvider<PomodoroTreeItem> {
   }
 
   private stateToEmoji(state: IState) {
-    return (state.isPaused)
+    return (state.isBreak)
               ? '🌴'
               : '🔨';
   }
 
   private stateToCaption(state: IState) {
-    return (state.isPaused)
+    return (state.isBreak)
               ? 'Cooling down'
               : 'Nailing it';
   }

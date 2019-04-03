@@ -1,3 +1,5 @@
+import { Action } from "redux";
+
 export const START_ACTION = 'start';
 export const STOP_ACTION = 'stop';
 export const RESET_ACTION = 'reset';
@@ -12,15 +14,26 @@ export function tick() {
     };
 }
 
-export function startAction() {
+export function startAction(remainingTime: number): IStartAction {
     return {
-        type: START_ACTION
+        type: START_ACTION,
+        remainingTime
     };
 }
 
-export function stopAction() {
+export interface IStopAction extends Action {
+    remainingTime: number;
+}
+
+export interface IStartAction extends Action {
+    remainingTime: number;
+}
+
+
+export function stopAction(remainingTime: number): IStopAction {
     return {
-        type: STOP_ACTION
+        type: STOP_ACTION,
+        remainingTime
     };
 }
 
@@ -37,9 +50,16 @@ export function resetAction() {
     };
 }
 
-export function completeCurrentSegmentAction() {
+export interface ICompleteCurrentSegmentAction extends Action {
+    nextSegmentTime: number;
+    shouldPause: boolean;
+}
+
+export function completeCurrentSegmentAction(nextSegmentTime: number, shouldPause: boolean): ICompleteCurrentSegmentAction {
     return {
-        type: COMPLETE_CURRENT_SEGMENT_ACTION
+        type: COMPLETE_CURRENT_SEGMENT_ACTION,
+        nextSegmentTime,
+        shouldPause
     };
 }
 

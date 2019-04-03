@@ -126,7 +126,7 @@
   },
   "dependencies": {
     "mobx": "^5.9.0",
-    "vsls-redux": "^1.0.1",
+    "vsls-redux": "^1.0.3",
     "redux": "^4.0.1"
   }
 }
