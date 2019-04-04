@@ -27,4 +27,4 @@ steps:
     nugetpat: 'vscloudkernel-nuget'
     language: typescript
     githubpat: 'vsls-contrib'
-    nugetVersion: '0.1.806-alpha-g2adb5dd333'
+    nugetVersion: 'latest'
