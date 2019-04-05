@@ -4,10 +4,72 @@ import { secondsToTimeString } from "./utils/secondsToTimeString";
 import { APP_NAME, START_COMMAND, STOP_COMMAND } from "./constants";
 import { Store, Action } from 'redux';
 import { IAppState, IState } from "./IAppState";
+import { IPomodoroConfig, config } from "./pomodoroConfig";
 
 enum PomodoroTreeItem {
   root = 'root',
   controls = 'controls'
+}
+
+const ACTIVE_LABELS = ['Nailing it', 'Nailing it [2]', 'Nailing it [3]', 'Nailing it [4]', 'Nailing it [5]'];
+const BREAK_LABELS = ['Cooling down', 'Cooling down [2]', 'Cooling down [3]', 'Cooling down [4]', 'Cooling down [5]'];
+const START_LABELS = ['Ready to work', 'Ready to work [2]', 'Ready to work [3]', 'Ready to work [4]', 'Ready to work [5]'];
+const FINISHED_LABELS = ['Well done!', 'Well done! [2]', 'Well done! [3]', 'Well done! [4]', 'Well done! [5]'];
+
+const randInt = (min: number, max: number) => {
+  const delta = (max - min) + 1;
+  
+  return Math.floor((Math.random() * delta)) + min;
+}
+
+const randLabel = (array: string[]) => {
+  if (!array || array.length === 0) {
+    throw new Error('Array is empty of null.');
+  }
+  const randomIndex = randInt(0, array.length - 1);
+  return array[randomIndex];
+}
+
+enum FullState {
+  HaveNotStarted,
+  Finished,
+  Working,
+  Break
+}
+
+const appStateToFullState = (appState: IAppState) => {
+  if (appState.state.isFinished) {
+    return FullState.Finished;
+  }
+  
+  if (appState.state.isPaused && (appState.completedSegments === 0)) {
+    return FullState.HaveNotStarted;
+  }
+
+  if (appState.state.isBreak) {
+    return FullState.Break;
+  } else {
+    return FullState.Working;
+  }
+}
+
+const appStateToLabel = (appState: IAppState) => {
+  const fullState = appStateToFullState(appState);
+  
+  switch (fullState) {
+    case FullState.Working: {
+      return randLabel(ACTIVE_LABELS);
+    }
+    case FullState.Break: {
+      return randLabel(BREAK_LABELS);
+    }
+    case FullState.HaveNotStarted: {
+      return randLabel(START_LABELS);
+    }
+    case FullState.Finished: {
+      return randLabel(FINISHED_LABELS);
+    }
+  }
 }
 
 class PomodoroTreeDataProvider implements TreeDataProvider<PomodoroTreeItem> {
@@ -57,12 +119,13 @@ class PomodoroTreeDataProvider implements TreeDataProvider<PomodoroTreeItem> {
   }
   
   private getControlsItem(): TreeItem {
-    const { remainingTime, state} = this.store.getState();
+    const appState = this.store.getState();
+    const { remainingTime, state, completedSegments, config } = appState;
     const remainingTimeString = secondsToTimeString(remainingTime);
 
     const treeItem = new TreeItem(APP_NAME);
     treeItem.contextValue = 'liveshare.pomodoro.controlsitem';
-    treeItem.label = `${this.stateToEmoji(state)} ${this.stateToCaption(state)}... - [${remainingTimeString}]`;
+    treeItem.label = `${this.stateToEmoji(state)} ${this.stateToCaption(appState)}... - [${remainingTimeString}]`;
     treeItem.command = this.stateToCommand(state);
     treeItem.collapsibleState = TreeItemCollapsibleState.None;
     return treeItem;
@@ -70,14 +133,12 @@ class PomodoroTreeDataProvider implements TreeDataProvider<PomodoroTreeItem> {
 
   private stateToEmoji(state: IState) {
     return (state.isBreak)
-              ? '🌴'
-              : '🔨';
+              ? config.breakEmoji
+              : config.workingEmoji;
   }
 
-  private stateToCaption(state: IState) {
-    return (state.isBreak)
-              ? 'Cooling down'
-              : 'Nailing it';
+  private stateToCaption(state: IAppState) {
+    return appStateToLabel(state);
   }
 }
 

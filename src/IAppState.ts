@@ -8,6 +8,7 @@ export interface IAppState {
 export interface IState {
     isPaused: boolean;
     isBreak: boolean;
+    isFinished: boolean;
 }
 
 export interface IPomodoroConfig {

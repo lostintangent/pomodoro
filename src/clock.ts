@@ -1,6 +1,6 @@
 import { Store, Action } from "redux";
 import { IAppState } from "./IAppState";
-import { tick, completeCurrentSegmentAction } from "./actions/actions";
+import { tick, completeCurrentSegmentAction, resetSegmentsAction } from "./actions/actions";
 
 export class Clock {
 
@@ -20,16 +20,20 @@ export class Clock {
         clearTimeout(this.timer!);
         this.timer = undefined;
 
-        const { state, remainingTime, config } = this.store.getState();
+        const { state, remainingTime, config, completedSegments } = this.store.getState();
 
         if (remainingTime < 1) {
-            const nextAction = (!state.isBreak)
-                ? completeCurrentSegmentAction(config.breakDuration, false)
-                : completeCurrentSegmentAction(0, true);
-            
-            process.stdout.write('\x07');
-
-            return this.store.dispatch(nextAction)
+            if (!state.isBreak) {
+                const breakDuration = (completedSegments === (config.intervalCount - 1))
+                                      ? config.breakDuration
+                                      : config.longBreakDuration;
+                this.store.dispatch(completeCurrentSegmentAction(breakDuration, false));
+            } else {
+                this.store.dispatch(completeCurrentSegmentAction(0, true));
+                if (completedSegments === config.intervalCount) {
+                    this.store.dispatch(resetSegmentsAction());
+                }
+            }
         }
 
         if (!state.isPaused) {

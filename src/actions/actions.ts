@@ -7,6 +7,7 @@ export const PAUSE_ACTION = 'pause';
 export const TICK = 'tick';
 export const COMPLETE_CURRENT_SEGMENT_ACTION = 'complete_current_segment';
 export const SET_CONFIG_ACTION = 'set_config';
+export const RESET_SEGMENTS_ACTION = 'reset_segment';
 
 export function tick() {
     return {
@@ -29,6 +30,11 @@ export interface IStartAction extends Action {
     remainingTime: number;
 }
 
+export function resetSegmentsAction(): Action {
+    return {
+        type: RESET_SEGMENTS_ACTION
+    };
+}
 
 export function stopAction(remainingTime: number): IStopAction {
     return {

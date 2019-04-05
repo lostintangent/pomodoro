@@ -1,10 +1,11 @@
-import { START_ACTION, PAUSE_ACTION, RESET_ACTION, STOP_ACTION, COMPLETE_CURRENT_SEGMENT_ACTION, ICompleteCurrentSegmentAction } from '../actions/actions';
+import { START_ACTION, PAUSE_ACTION, RESET_ACTION, STOP_ACTION, COMPLETE_CURRENT_SEGMENT_ACTION, RESET_SEGMENTS_ACTION, ICompleteCurrentSegmentAction } from '../actions/actions';
 import { Action } from 'redux';
 import { IState } from '../IAppState';
 
 const DEFAULT_STATE_STATE = {
   isPaused: true,
-  isBreak: true
+  isBreak: true,
+  isFinished: true
 };
 
 export const stateReducer = (state: IState = DEFAULT_STATE_STATE, action: Action<any>): IState => {
@@ -13,7 +14,8 @@ export const stateReducer = (state: IState = DEFAULT_STATE_STATE, action: Action
         return {
             ...state,
             isBreak: false,
-            isPaused: false
+            isPaused: false,
+            isFinished: false
         }
   
         case PAUSE_ACTION:
@@ -37,6 +39,14 @@ export const stateReducer = (state: IState = DEFAULT_STATE_STATE, action: Action
             ...state,
             isBreak: true,
             isPaused: shouldPause
+          }
+
+        case RESET_SEGMENTS_ACTION:
+          return {
+            ...state,
+            isBreak: false,
+            isPaused: true,
+            isFinished: true
           }
         break;
     }
