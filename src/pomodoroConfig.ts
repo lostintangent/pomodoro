@@ -12,6 +12,8 @@ export interface IPomodoroConfig {
   longBreakDuration: number;
   workingEmoji: string;
   breakEmoji: string;
+  longBreakEmoji: string;
+  finishedEmoji: string;
 }
 
 export const config: IPomodoroConfig = {
@@ -32,6 +34,12 @@ export const config: IPomodoroConfig = {
   },
   get breakEmoji() {
     return getConfigValue("breakEmoji") || '🌴';
+  },
+  get longBreakEmoji() {
+    return getConfigValue("longBreakEmoji") || '🏖️';
+  },
+  get finishedEmoji() {
+    return getConfigValue("finishedEmoji") || '💪';
   },
 };
 

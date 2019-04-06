@@ -5,7 +5,7 @@ import { IState } from '../IAppState';
 const DEFAULT_STATE_STATE = {
   isPaused: true,
   isBreak: true,
-  isFinished: true
+  isFinished: false
 };
 
 export const stateReducer = (state: IState = DEFAULT_STATE_STATE, action: Action<any>): IState => {

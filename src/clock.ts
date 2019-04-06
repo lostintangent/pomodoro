@@ -25,8 +25,8 @@ export class Clock {
         if (remainingTime < 1) {
             if (!state.isBreak) {
                 const breakDuration = (completedSegments === (config.intervalCount - 1))
-                                      ? config.breakDuration
-                                      : config.longBreakDuration;
+                                      ? config.longBreakDuration
+                                      : config.breakDuration;
                 this.store.dispatch(completeCurrentSegmentAction(breakDuration, false));
             } else {
                 this.store.dispatch(completeCurrentSegmentAction(0, true));
@@ -36,7 +36,8 @@ export class Clock {
             }
         }
 
-        if (!state.isPaused) {
+        const { state: newState } = this.store.getState();
+        if (!newState.isPaused) {
             this.timer = setTimeout(this.tick, 1000);
             this.store.dispatch(tick());
         }

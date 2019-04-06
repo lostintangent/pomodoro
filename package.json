@@ -108,12 +108,22 @@
         "vsls-pomodoro.workingEmoji": {
           "default": "🔨",
           "type": "string",
-          "description": "Specifies emoji shown when the working period is active"
+          "description": "Specifies the emoji displayed while within an interval"
         },
         "vsls-pomodoro.breakEmoji": {
           "default": "🌴",
           "type": "string",
-          "description": "Specifies emoji shown when the working period is active"
+          "description": "Specifies the emoji displaying during a break"
+        },
+        "vsls-pomodoro.longBreakEmoji": {
+          "default": "🏖️",
+          "type": "string",
+          "description": "Specifies the emoji displayed during a long break"
+        },
+        "vsls-pomodoro.finishedEmoji": {
+          "default": "💪",
+          "type": "string",
+          "description": "Specifies the emoji displayed after you finish a pomodoro"
         }
       }
     }
