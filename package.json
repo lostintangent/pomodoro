@@ -1,8 +1,11 @@
 {
   "name": "vsls-pomodoro",
-  "displayName": "VS Live Share Pomodoro",
+  "publisher": "lostintangent",
+  "displayName": "Live Share Pomodoro",
   "description": "Adds a collaborative Pomodoro timer to Visual Studio Live Share sessions",
   "version": "0.0.1",
+  "preview": true,
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.30.0"
   },
@@ -25,17 +28,17 @@
         "title": "Start",
         "category": "Pomodoro",
         "icon": {
-          "dark": "",
-          "light": ""
+          "dark": "./images/play.svg",
+          "light": "./images/play.svg"
         }
       },
       {
-        "command": "liveshare.pomodoro.pause",
-        "title": "Pause",
+        "command": "liveshare.pomodoro.stop",
+        "title": "Stop",
         "category": "Pomodoro",
         "icon": {
-          "dark": "",
-          "light": ""
+          "dark": "./images/stop.svg",
+          "light": "./images/stop.svg"
         }
       },
       {
@@ -43,19 +46,48 @@
         "title": "Reset",
         "category": "Pomodoro",
         "icon": {
-          "dark": "",
-          "light": ""
+          "dark": "./images/cross.svg",
+          "light": "./images/cross.svg"
         }
       }
     ],
     "menus": {
+      "view/item/context": [
+        {
+          "command": "liveshare.pomodoro.stop",
+          "when": "viewItem == liveshare.pomodoro.controlsitem && liveshare.pomodoro.state == running",
+          "group": "inline"
+        },
+        {
+          "command": "liveshare.pomodoro.start",
+          "when": "viewItem == liveshare.pomodoro.controlsitem && liveshare.pomodoro.state == stopped",
+          "group": "inline"
+        },
+        {
+          "command": "liveshare.pomodoro.reset",
+          "when": "viewItem == liveshare.pomodoro.root",
+          "group": "inline"
+        },
+        {
+          "command": "liveshare.pomodoro.stop",
+          "when": "viewItem == liveshare.pomodoro.controlsitem && liveshare.pomodoro.state == running"
+        },
+        {
+          "command": "liveshare.pomodoro.start",
+          "when": "viewItem == liveshare.pomodoro.controlsitem && liveshare.pomodoro.state == stopped"
+        },
+        {
+          "command": "liveshare.pomodoro.reset",
+          "when": "viewItem == liveshare.pomodoro.root"
+        }
+      ],
       "commandPalette": [
         {
           "command": "liveshare.pomodoro.start",
           "when": "liveshare.pomodoro.state == stopped || liveshare.pomodoro.state == paused"
         },
         {
-          "command": "liveshare.pomodoro.pause",
+          "command": "liveshare.pomodoro.stop",
           "when": "liveshare.pomodoro.state == running"
         },
         {
@@ -87,6 +119,56 @@
           "default": 4,
           "type": "number",
           "description": "Specifies the number of intervals to perform within a pomodoro session."
+        },
+        "vsls-pomodoro.getStartedEmoji": {
+          "default": "🍅",
+          "type": "string",
+          "description": "Specifies the emoji displayed before starting a pomodoro"
+        },
+        "vsls-pomodoro.workingEmoji": {
+          "default": "🔨",
+          "type": "string",
+          "description": "Specifies the emoji displayed while within an interval"
+        },
+        "vsls-pomodoro.breakEmoji": {
+          "default": "🌴",
+          "type": "string",
+          "description": "Specifies the emoji displaying during a break"
+        },
+        "vsls-pomodoro.longBreakEmoji": {
+          "default": "🏖️",
+          "type": "string",
+          "description": "Specifies the emoji displayed during a long break"
+        },
+        "vsls-pomodoro.finishedEmoji": {
+          "default": "💪",
+          "type": "string",
+          "description": "Specifies the emoji displayed after you finish a pomodoro"
+        },
+        "vsls-pomodoro.getStartedLabel": {
+          "default": "Ready to work!",
+          "type": "string",
+          "description": "Specifies the label displayed before starting a pomodoro"
+        },
+        "vsls-pomodoro.workingLabel": {
+          "default": "Working",
+          "type": "string",
+          "description": "Specifies the label displayed while within an interval"
+        },
+        "vsls-pomodoro.breakLabel": {
+          "default": "Taking a break",
+          "type": "string",
+          "description": "Specifies the label displayed during a break"
+        },
+        "vsls-pomodoro.longBreakLabel": {
+          "default": "Taking a long break",
+          "type": "string",
+          "description": "Specifies the label displayed during a long break"
+        },
+        "vsls-pomodoro.finishedLabel": {
+          "default": "Well done!",
+          "type": "string",
+          "description": "Specifies the label displayed while within an interval"
         }
       }
     }
@@ -101,9 +183,14 @@
   "devDependencies": {
     "@types/mocha": "^2.2.42",
     "@types/node": "^8.10.25",
+    "@types/redux": "^3.6.0",
     "tslint": "^5.8.0",
     "typescript": "^3.1.4",
     "vscode": "^1.1.25",
     "vsls": "^0.3.967"
+  },
+  "dependencies": {
+    "redux": "^4.0.1",
+    "vsls-redux": "^1.0.3"
   }
 }
