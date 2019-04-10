@@ -48,16 +48,3 @@ export function resetAction() {
         type: RESET_ACTION
     };
 }
-
-
-/***
-Stopped - You haven't started a timer, or you reset the timer
-  Actions: Start, Reset
-Paused - You paused the timer or re in a break
-  Actions: Resume, Reset  
-Running - Witin a current timer
-  Which interval are you within
-  How much timer is left
-
-  Actions: Stop, Pause, Reset
-*/

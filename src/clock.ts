@@ -20,7 +20,12 @@ export class Clock {
         clearTimeout(this.timer!);
         this.timer = undefined;
 
-        const { state, remainingTime, config, completedSegments } = this.store.getState();
+        const {
+            state,
+            remainingTime,
+            config,
+            completedSegments
+        } = this.store.getState();
 
         if (remainingTime < 1) {
             if (!state.isBreak) {

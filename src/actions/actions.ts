@@ -3,7 +3,6 @@ import { Action } from "redux";
 export const START_ACTION = 'start';
 export const STOP_ACTION = 'stop';
 export const RESET_ACTION = 'reset';
-export const PAUSE_ACTION = 'pause';
 export const TICK = 'tick';
 export const COMPLETE_CURRENT_SEGMENT_ACTION = 'complete_current_segment';
 export const SET_CONFIG_ACTION = 'set_config';
@@ -39,13 +38,6 @@ export function resetSegmentsAction(): Action {
 export function stopAction(remainingTime: number): IStopAction {
     return {
         type: STOP_ACTION,
-        remainingTime
-    };
-}
-
-export function pauseAction(remainingTime: number) {
-    return {
-        type: PAUSE_ACTION,
         remainingTime
     };
 }

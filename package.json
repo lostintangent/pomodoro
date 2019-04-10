@@ -1,8 +1,11 @@
 {
   "name": "vsls-pomodoro",
-  "displayName": "VS Live Share Pomodoro",
+  "publisher": "lostintangent",
+  "displayName": "Live Share Pomodoro",
   "description": "Adds a collaborative Pomodoro timer to Visual Studio Live Share sessions",
   "version": "0.0.1",
+  "preview": true,
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.30.0"
   },
@@ -64,6 +67,18 @@
           "command": "liveshare.pomodoro.reset",
           "when": "viewItem == liveshare.pomodoro.root",
           "group": "inline"
+        },
+        {
+          "command": "liveshare.pomodoro.stop",
+          "when": "viewItem == liveshare.pomodoro.controlsitem && liveshare.pomodoro.state == running"
+        },
+        {
+          "command": "liveshare.pomodoro.start",
+          "when": "viewItem == liveshare.pomodoro.controlsitem && liveshare.pomodoro.state == stopped"
+        },
+        {
+          "command": "liveshare.pomodoro.reset",
+          "when": "viewItem == liveshare.pomodoro.root"
         }
       ],
       "commandPalette": [
@@ -105,6 +120,11 @@
           "type": "number",
           "description": "Specifies the number of intervals to perform within a pomodoro session."
         },
+        "vsls-pomodoro.getStartedEmoji": {
+          "default": "🍅",
+          "type": "string",
+          "description": "Specifies the emoji displayed before starting a pomodoro"
+        },
         "vsls-pomodoro.workingEmoji": {
           "default": "🔨",
           "type": "string",
@@ -124,6 +144,31 @@
           "default": "💪",
           "type": "string",
           "description": "Specifies the emoji displayed after you finish a pomodoro"
+        },
+        "vsls-pomodoro.getStartedLabel": {
+          "default": "Ready to work!",
+          "type": "string",
+          "description": "Specifies the label displayed before starting a pomodoro"
+        },
+        "vsls-pomodoro.workingLabel": {
+          "default": "Working",
+          "type": "string",
+          "description": "Specifies the label displayed while within an interval"
+        },
+        "vsls-pomodoro.breakLabel": {
+          "default": "Taking a break",
+          "type": "string",
+          "description": "Specifies the label displayed during a break"
+        },
+        "vsls-pomodoro.longBreakLabel": {
+          "default": "Taking a long break",
+          "type": "string",
+          "description": "Specifies the label displayed during a long break"
+        },
+        "vsls-pomodoro.finishedLabel": {
+          "default": "Well done!",
+          "type": "string",
+          "description": "Specifies the label displayed while within an interval"
         }
       }
     }
@@ -145,11 +190,6 @@
     "vsls": "^0.3.967"
   },
   "dependencies": {
-    "audio-loader": "^1.0.3",
-    "audio-play": "^2.2.1",
-    "mobx": "^5.9.0",
-    "play-sound": "^1.1.3",
-    "prettier": "^1.16.4",
     "redux": "^4.0.1",
     "vsls-redux": "^1.0.3"
   }

@@ -1,4 +1,4 @@
-import { START_ACTION, PAUSE_ACTION, RESET_ACTION, STOP_ACTION, COMPLETE_CURRENT_SEGMENT_ACTION, RESET_SEGMENTS_ACTION, ICompleteCurrentSegmentAction } from '../actions/actions';
+import { START_ACTION, RESET_ACTION, STOP_ACTION, COMPLETE_CURRENT_SEGMENT_ACTION, RESET_SEGMENTS_ACTION, ICompleteCurrentSegmentAction } from '../actions/actions';
 import { Action } from 'redux';
 import { IState } from '../IAppState';
 
@@ -18,15 +18,8 @@ export const stateReducer = (state: IState = DEFAULT_STATE_STATE, action: Action
             isFinished: false
         }
   
-        case PAUSE_ACTION:
-          return {
-              ...state,
-              isPaused: true
-            }
-          break;
-  
         case RESET_ACTION:
-          break;
+          return DEFAULT_STATE_STATE;
         case STOP_ACTION:
           return {
             ...state,

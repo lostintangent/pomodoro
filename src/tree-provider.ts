@@ -11,11 +11,6 @@ enum PomodoroTreeItem {
   controls = 'controls'
 }
 
-const ACTIVE_LABELS = ['Nailing it', 'Nailing it [2]', 'Nailing it [3]', 'Nailing it [4]', 'Nailing it [5]'];
-const BREAK_LABELS = ['Cooling down', 'Cooling down [2]', 'Cooling down [3]', 'Cooling down [4]', 'Cooling down [5]'];
-const START_LABELS = ['Ready to work', 'Ready to work [2]', 'Ready to work [3]', 'Ready to work [4]', 'Ready to work [5]'];
-const FINISHED_LABELS = ['Well done!', 'Well done! [2]', 'Well done! [3]', 'Well done! [4]', 'Well done! [5]'];
-
 const randInt = (min: number, max: number) => {
   const delta = (max - min) + 1;
   
@@ -60,16 +55,18 @@ const appStateToLabel = (appState: IAppState) => {
   
   switch (fullState) {
     case FullState.Working: {
-      return randLabel(ACTIVE_LABELS, completedSegments);
+      return randLabel(config.workingLabel, completedSegments);
     }
     case FullState.Break: {
-      return randLabel(BREAK_LABELS, completedSegments);
+      return (completedSegments === config.intervalCount)
+        ? randLabel(config.longBreakLabel, completedSegments)
+        : randLabel(config.breakLabel, completedSegments);
     }
     case FullState.HaveNotStarted: {
-      return randLabel(START_LABELS, completedSegments);
+      return randLabel(config.getStartedLabel, completedSegments);
     }
     case FullState.Finished: {
-      return randLabel(FINISHED_LABELS, completedSegments);
+      return randLabel(config.finishedLabel, completedSegments);
     }
   }
 }
@@ -110,12 +107,26 @@ class PomodoroTreeDataProvider implements TreeDataProvider<PomodoroTreeItem> {
     }
   }
 
+  stateToTicks(state: IAppState) {
+    let ticks = '';
+    for (let i = 0; i < config.intervalCount; i++) {
+      if (i < state.completedSegments) {
+        ticks += '✔';
+      } else {
+        break;
+      }
+    }
+
+    return ticks;
+  }
+
   getRootItem(): TreeItem {
     const { completedSegments, config } = this.store.getState();
 
     const treeItem = new TreeItem(APP_NAME);
     treeItem.contextValue = 'liveshare.pomodoro.root';
-    treeItem.label = `${APP_NAME} (${completedSegments}/${config.intervalCount})`;
+    
+    treeItem.label = `${APP_NAME} (${completedSegments}/${config.intervalCount}) ${this.stateToTicks(this.store.getState())}`;
     treeItem.collapsibleState = TreeItemCollapsibleState.Expanded;
     return treeItem;
   }
@@ -127,7 +138,9 @@ class PomodoroTreeDataProvider implements TreeDataProvider<PomodoroTreeItem> {
 
     const treeItem = new TreeItem(APP_NAME);
     treeItem.contextValue = 'liveshare.pomodoro.controlsitem';
-    treeItem.label = `${this.stateToEmoji(appState)} ${this.stateToCaption(appState)}... - [${remainingTimeString}]`;
+    const emoji = this.stateToEmoji(appState);
+    const caption = this.stateToCaption(appState);
+    treeItem.label = `${emoji} ${caption} (${remainingTimeString})`;
     treeItem.command = this.stateToCommand(state);
     treeItem.collapsibleState = TreeItemCollapsibleState.None;
     return treeItem;
@@ -135,9 +148,15 @@ class PomodoroTreeDataProvider implements TreeDataProvider<PomodoroTreeItem> {
 
   private stateToEmoji(appState: IAppState) {
     const { state, completedSegments } = appState;
-    const { isFinished, isBreak } = state;
+    const { isFinished, isBreak, isPaused } = state;
 
     if (isBreak) {
+      const hasNotStarted = (completedSegments === 0) && isPaused && !isFinished;
+
+      if (hasNotStarted) {
+        return config.getStartedEmoji;
+      }
+      
       return (completedSegments === config.intervalCount)
         ? config.longBreakEmoji
         : config.breakEmoji;

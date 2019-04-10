@@ -1,4 +1,4 @@
-import { COMPLETE_CURRENT_SEGMENT_ACTION, ICompleteCurrentSegmentAction, RESET_SEGMENTS_ACTION } from '../actions/actions';
+import { COMPLETE_CURRENT_SEGMENT_ACTION, ICompleteCurrentSegmentAction, RESET_SEGMENTS_ACTION, RESET_ACTION } from '../actions/actions';
 import { Action } from 'redux';
 
 const DEFAULT_COMPLETED_SEGMENTS = 0;
@@ -10,8 +10,9 @@ export const completedSegmentsReducer = (state: number = DEFAULT_COMPLETED_SEGME
 
         return state + ((shouldPause) ? 0 : 1);
       }
+      case RESET_ACTION:
       case RESET_SEGMENTS_ACTION: {
-        return 0;
+        return DEFAULT_COMPLETED_SEGMENTS;
       }
     }
     

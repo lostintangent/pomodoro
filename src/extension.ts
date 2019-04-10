@@ -4,7 +4,7 @@ import { registerLiveShareSessionProvider } from "./tree-provider";
 
 import { COMMAND_IDS, State } from "./constants";
 import { createStore, combineReducers, Action } from 'redux';
-import { startAction, resetAction, TICK, stopAction } from "./actions/actions";
+import { startAction, resetAction, TICK, stopAction, COMPLETE_CURRENT_SEGMENT_ACTION, RESET_SEGMENTS_ACTION } from "./actions/actions";
 import { stateReducer } from "./reducers/stateReducer";
 import { configReducer, remainingTimeReducer, completedSegmentsReducer } from "./reducers";
 import { Clock } from "./clock";
@@ -26,12 +26,12 @@ const reducer = combineReducers({
   state: stateReducer,
 });
 
-function tickFilter(action: Action): boolean {
-  return (action.type !== TICK);
+function actionFilter(action: Action): boolean {
+  return [TICK, COMPLETE_CURRENT_SEGMENT_ACTION, RESET_SEGMENTS_ACTION].indexOf(action.type) === -1;
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-  const store = createStore(shareState(reducer), undefined, vslsStoreEnhancer(tickFilter) as any);
+  const store = createStore(shareState(reducer), undefined, vslsStoreEnhancer(actionFilter) as any);
 
   new Clock(store);
 

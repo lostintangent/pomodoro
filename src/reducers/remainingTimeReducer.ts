@@ -1,6 +1,6 @@
 
 import { Action } from 'redux';
-import { TICK, STOP_ACTION, COMPLETE_CURRENT_SEGMENT_ACTION, ICompleteCurrentSegmentAction, IStopAction, IStartAction, START_ACTION } from '../actions/actions';
+import { TICK, STOP_ACTION, COMPLETE_CURRENT_SEGMENT_ACTION, ICompleteCurrentSegmentAction, IStopAction, IStartAction, START_ACTION, RESET_ACTION } from '../actions/actions';
 
 import { config } from '../pomodoroConfig';
 
@@ -17,6 +17,10 @@ export const remainingTimeReducer = (currentRemainingTime: number = config.inter
       }
       case STOP_ACTION: {
         return (action as IStopAction).remainingTime;
+      }
+
+      case RESET_ACTION: {
+        return config.intervalDuration;
       }
     }
     
