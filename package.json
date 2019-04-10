@@ -1,16 +1,29 @@
 {
   "name": "vsls-pomodoro",
-  "publisher": "lostintangent",
   "displayName": "Live Share Pomodoro",
+  "publisher": "lostintangent",
   "description": "Adds a collaborative Pomodoro timer to Visual Studio Live Share sessions",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "preview": true,
   "icon": "images/icon.png",
+  "homepage": "https://github.com/vsls-contrib/pomodoro",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vsls-contrib/pomodoro"
+  },
+  "bugs": {
+    "url": "https://github.com/vsls-contrib/pomodoro/issues"
+  },
   "engines": {
     "vscode": "^1.30.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "collaboration",
+    "pair programming",
+    "productivity"
   ],
   "activationEvents": [
     "onFileSystem:vsls",
@@ -192,5 +205,8 @@
   "dependencies": {
     "redux": "^4.0.1",
     "vsls-redux": "^1.0.3"
-  }
+  },
+  "extensionDependencies": [
+    "ms-vsliveshare.vsliveshare"
+  ]
 }
