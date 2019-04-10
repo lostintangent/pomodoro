@@ -2,7 +2,7 @@
   "name": "vsls-pomodoro",
   "displayName": "Live Share Pomodoro",
   "publisher": "lostintangent",
-  "description": "Adds a collaborative Pomodoro timer to Visual Studio Live Share sessions",
+  "description": "Adds a collaborative pomodoro timer to Visual Studio Live Share sessions",
   "version": "0.1.0",
   "preview": true,
   "icon": "images/icon.png",
