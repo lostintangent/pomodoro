@@ -184,6 +184,11 @@
           "default": "Well done!",
           "type": "string",
           "description": "Specifies the label displayed while within an interval"
+        },
+        "vsls-pomodoro.notification": {
+          "default": true,
+          "type": "boolean",
+          "description": "Specifies whether or not you receive a notification when a work interval completes."
         }
       }
     }

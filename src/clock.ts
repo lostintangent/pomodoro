@@ -1,6 +1,7 @@
-import { Store, Action } from "redux";
-import { IAppState } from "./IAppState";
-import { tick, completeCurrentSegmentAction, resetSegmentsAction } from "./actions/actions";
+import { Store, Action } from 'redux';
+import { IAppState } from './IAppState';
+import { tick, completeCurrentSegmentAction, resetSegmentsAction } from './actions/actions';
+import * as vscode from 'vscode';
 
 export class Clock {
 
@@ -32,6 +33,7 @@ export class Clock {
                 const breakDuration = (completedSegments === (config.intervalCount - 1))
                                       ? config.longBreakDuration
                                       : config.breakDuration;
+                showNotification();
                 this.store.dispatch(completeCurrentSegmentAction(breakDuration, false));
             } else {
                 this.store.dispatch(completeCurrentSegmentAction(0, true));
@@ -42,10 +44,23 @@ export class Clock {
         }
 
         const { state: newState } = this.store.getState();
-        if (!newState.isPaused) {
+        if (!newState.isPaused) {5
             this.timer = setTimeout(this.tick, 1000);
             this.store.dispatch(tick());
         }
     }
 
+}
+
+async function showNotification() {
+    const configNamespace = 'vsls-pomodoro';
+    const notificationSettingName = 'notification';
+    const showNotification = vscode.workspace.getConfiguration(configNamespace).get<boolean>(notificationSettingName)!;
+    if (showNotification) {
+        const dontShowButton = 'Don\'t show notifications';
+        const questionResult = await vscode.window.showInformationMessage('Interval completed!', dontShowButton);
+        if (questionResult === dontShowButton) {
+            await vscode.workspace.getConfiguration(configNamespace).update(notificationSettingName, 0, true);
+        }
+    }
 }
