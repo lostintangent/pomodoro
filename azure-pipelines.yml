@@ -4,15 +4,11 @@ queue:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '8.x'
+    versionSpec: '10.x'
 
 - script: npm install
   displayName: Install dependencies
 
 - task: RichCodeNavIndexer@0
   inputs:
-    serviceConnection: 'rich-code-nav'
-    nugetServiceConnection: 'rich-code-nav-nuget'
-    githubServiceConnection: 'vsls-contrib'
     languages: typescript
-    serviceEndpoint: 'https://prod.richnav.vsengsaas.visualstudio.com'
